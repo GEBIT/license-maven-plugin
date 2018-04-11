@@ -52,6 +52,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -312,6 +313,24 @@ public abstract class AbstractAddThirdPartyMojo
      */
     @Parameter( property = "license.missingFileUrl" )
     protected String missingFileUrl;
+
+    /**
+     * Directly provided entries for missing licenses for dependencies with unknwon license. The key is GAV, the value
+     * is the license (both same as in the missing file).
+     *
+     * @since 1.16-gebit1
+     */
+    @Parameter
+    protected Properties missing;
+
+    /**
+     * If there are artifacts referenced in the missing file which are not actually used, a warning will be printed
+     * by default. In a multi module build with a centralised missing file you do not want this and can disable it.
+     *
+     * @since 1.16-gebit1
+     */
+    @Parameter( property = "license.ignoreUnusedMissing", defaultValue = "false" )
+    protected boolean ignoreUnusedMissing;
 
     /**
      * To resolve third party licenses from an artifact.
@@ -900,7 +919,10 @@ public abstract class AbstractAddThirdPartyMojo
             String httpRequestResult = UrlRequester.getFromUrl( missingFileUrl );
             unsafeMappings.load( new ByteArrayInputStream( httpRequestResult.getBytes() ) );
         }
-
+        if ( missing != null )
+        {
+            unsafeMappings.putAll( missing );
+        }
         if ( !unsafeMappings.isEmpty() )
         {
             Set<MavenProject> resolvedDependencies = new HashSet<>();
