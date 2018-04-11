@@ -1,5 +1,14 @@
 package org.codehaus.mojo.license.api;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+
 /*
  * #%L
  * License Maven Plugin
@@ -31,14 +40,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.SortedProperties;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
 
 /**
  * A tool to load third party files missing files.
@@ -141,11 +142,13 @@ public interface ThirdPartyTool
      * @param missingFile     location of the optional missing file
      * @param missingFileUrl  location of an optional missing file extension that can be downloaded from some
      *                        resource hoster and that will be merged with the content of the missing file.
+     * @param ignoreUnusedMissing set to true to not print warnings for entries in missing file that are not found
      * @return the unsafe mapping
      * @throws IOException if pb while reading missing file
      */
     SortedProperties loadUnsafeMapping( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
-                                        String encoding, File missingFile, String missingFileUrl )
+                                        String encoding, File missingFile, String missingFileUrl,
+                                        Properties missing, boolean ignoreUnusedMissing)
             throws IOException, MojoExecutionException;
 
     /**

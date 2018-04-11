@@ -1,5 +1,19 @@
 package org.codehaus.mojo.license.api;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+
 /*
  * #%L
  * License Maven Plugin
@@ -32,19 +46,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.SortedProperties;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
 
 /**
  * Default implementation of the {@link org.codehaus.mojo.license.api.ThirdPartyHelper}.
@@ -172,10 +173,12 @@ public class DefaultThirdPartyHelper
      * {@inheritDoc}
      */
     public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
+                                               Properties missingMapping, boolean ignoreUnusedMissing,
                                                SortedMap<String, MavenProject> projectDependencies )
       throws IOException, MojoExecutionException
     {
-        return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile, missingFileUrl);
+        return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile, missingFileUrl,
+                                                 missingMapping, ignoreUnusedMissing);
     }
 
     /**
@@ -216,14 +219,15 @@ public class DefaultThirdPartyHelper
      */
     @SuppressWarnings( "unchecked" ) // project.getArtifacts()
     public SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                                 boolean useRepositoryMissingFiles,
+                                                 Properties missingMapping,
+                                                 boolean useRepositoryMissingFiles, boolean ignoreUnusedMissing,
                                                  SortedSet<MavenProject> unsafeDependencies,
                                                  SortedMap<String, MavenProject> projectDependencies )
       throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException
     {
 
-        SortedProperties unsafeMappings = loadUnsafeMapping( licenseMap, missingFile, missingFileUrl,
-                                                             projectDependencies );
+        SortedProperties unsafeMappings = loadUnsafeMapping( licenseMap, missingFile, missingFileUrl, missingMapping,
+                                                             ignoreUnusedMissing, projectDependencies );
 
         if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
         {

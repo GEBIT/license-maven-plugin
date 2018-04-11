@@ -1,5 +1,16 @@
 package org.codehaus.mojo.license;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,16 +36,6 @@ import org.codehaus.mojo.license.utils.HttpRequester;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.codehaus.mojo.license.utils.StringToList;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
 
 /*
  * #%L
@@ -231,6 +232,24 @@ public abstract class AbstractAddThirdPartyMojo
      */
     @Parameter( property = "license.missingFileUrl" )
     String missingFileUrl;
+
+    /**
+     * Directly provided entries for missing licenses for dependencies with unknwon license. The key is GAV, the value
+     * is the license (both same as in the missing file).
+     *
+     * @since 1.16-gebit1
+     */
+    @Parameter
+    Properties missing;
+
+    /**
+     * If there are artifacts referenced in the missing file which are not actually used, a warning will be printed
+     * by default. In a multi module build with a centralised missing file you do not want this and can disable it.
+     *
+     * @since 1.16-gebit1
+     */
+    @Parameter( property = "license.ignoreUnusedMissing", defaultValue = "false" )
+    boolean ignoreUnusedMissing;
 
     /**
      * To resolve third party licenses from an artifact.
@@ -815,6 +834,9 @@ public abstract class AbstractAddThirdPartyMojo
             {
                 String httpRequestResult = HttpRequester.getFromUrl(missingFileUrl);
                 unsafeMappings.load(new ByteArrayInputStream(httpRequestResult.getBytes()));
+            }
+            if (missing != null) {
+                unsafeMappings.putAll(missing);
             }
 
             Set<MavenProject> resolvedDependencies = new HashSet<MavenProject>();

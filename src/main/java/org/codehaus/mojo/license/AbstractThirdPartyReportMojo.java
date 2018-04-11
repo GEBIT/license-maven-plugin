@@ -1,5 +1,18 @@
 package org.codehaus.mojo.license;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 /*
  * #%L
  * License Maven Plugin
@@ -48,18 +61,6 @@ import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.plexus.i18n.I18N;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * Base class for third-party reports.
@@ -182,6 +183,24 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
      */
     @Parameter( property = "license.missingFileUrl" )
     String missingFileUrl;
+
+    /**
+     * Directly provided entries for missing licenses for dependencies with unknwon license. The key is GAV, the value
+     * is the license (both same as in the missing file).
+     *
+     * @since 1.16-gebit1
+     */
+    @Parameter
+    Properties missing;
+
+    /**
+     * If there are artifacts referenced in the missing file which are not actually used, a warning will be printed
+     * by default. In a multi module build with a centralised missing file you do not want this and can disable it.
+     *
+     * @since 1.16-gebit1
+     */
+    @Parameter( property = "license.ignoreUnusedMissing", defaultValue = "false" )
+    boolean ignoreUnusedMissing;
 
     /**
      * The file where to fill the override license for dependencies.
@@ -546,7 +565,8 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
             if ( useMissingFile )
             {
                 // Resolve unsafe dependencies using missing files, this will update licenseMap and unsafeDependencies
-                thirdPartyHelper.createUnsafeMapping( licenseMap, missingFile, missingFileUrl, useRepositoryMissingFiles,
+                thirdPartyHelper.createUnsafeMapping( licenseMap, missingFile, missingFileUrl, missing,
+                                                      useRepositoryMissingFiles, ignoreUnusedMissing,
                                                       dependenciesWithNoLicense, projectDependencies );
             }
         }
