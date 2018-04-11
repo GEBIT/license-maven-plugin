@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -84,12 +85,15 @@ public interface ThirdPartyHelper
      * @param missingFile         location of an optional missing fille (says where you fix missing license).
      * @param missingFileUrl      location of an optional missing file extension that can be downloaded from some
      *                            resource hoster and that will be merged with the content of the missing file.
+     * @param missingMapping      configured mapping for missing licenses.
+     * @param ignoreUnusedMissing set to true to not print warnings for entries in missing file that are not found
      * @param projectDependencies project dependencies used to detect which dependencies in the missing file
      *                            are unknown to the project.
      * @return the map of all unsafe mapping
      * @throws IOException if could not load missing file
      */
     SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
+                                        Properties missingMapping, boolean ignoreUnusedMissing,
                                         SortedMap<String, MavenProject> projectDependencies )
       throws IOException, MojoExecutionException;
 
@@ -142,8 +146,10 @@ public interface ThirdPartyHelper
      * @param missingFileUrl            location of an optional missing file extension that can be downloaded from
      *                                  some resource hoster and that will be merged with the content of the missing
      *                                  file.
+     * @param missingMapping            configured mapping for missing licenses.
      * @param useRepositoryMissingFiles flag to use or not third-party descriptors via the 'third-party' classifier from
      *                                  maven repositories
+     * @param ignoreUnusedMissing set to true to not print warnings for entries in missing file that are not found
      * @param unsafeDependencies        all unsafe dependencies
      * @param projectDependencies       all project dependencies
      * @param dependencyArtifacts       all project dependency artifacts
@@ -152,12 +158,15 @@ public interface ThirdPartyHelper
      * @throws IOException              if could not load missing file
      * @throws ThirdPartyToolException  if pb with third-party tool
      */
+    // CHECKSTYLE_OFF: ParameterNumber
     SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                          boolean useRepositoryMissingFiles,
+                                          Properties missingMapping,
+                                          boolean useRepositoryMissingFiles, boolean ignoreUnusedMissing,
                                           SortedSet<MavenProject> unsafeDependencies,
                                           SortedMap<String, MavenProject> projectDependencies,
                                           Set<Artifact> dependencyArtifacts )
       throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException;
+    // CHECKSTYLE_ON: ParameterNumber
 
     /**
      * Merges licenses.

@@ -36,6 +36,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -462,7 +463,9 @@ public class DefaultThirdPartyTool
                                                SortedMap<String, MavenProject> artifactCache,
                                                String encoding,
                                                File missingFile,
-                                               String missingFileUrl ) throws IOException, MojoExecutionException
+                                               String missingFileUrl,
+                                               Properties missingMapping,
+                                               boolean ignoreUnusedMissing ) throws IOException, MojoExecutionException
     {
         Map<String, MavenProject> snapshots = new HashMap<>();
 
@@ -506,6 +509,11 @@ public class DefaultThirdPartyTool
             unsafeMappings.load( new ByteArrayInputStream( httpRequestResult.getBytes() ) );
         }
 
+        if ( missingMapping != null )
+        {
+            unsafeMappings.putAll( missingMapping );
+        }
+
         // get from the missing file, all unknown dependencies
         List<String> unknownDependenciesId = new ArrayList<>();
 
@@ -544,8 +552,11 @@ public class DefaultThirdPartyTool
             // there is some unknown dependencies in the missing file, remove them
             for ( String id : unknownDependenciesId )
             {
-                getLogger().warn(
-                        "dependency [" + id + "] does not exist in project, remove it from the missing file." );
+                if ( !ignoreUnusedMissing )
+                {
+                    getLogger().warn(
+                            "dependency [" + id + "] does not exist in project, remove it from the missing file." );
+                }
                 unsafeMappings.remove( id );
             }
 

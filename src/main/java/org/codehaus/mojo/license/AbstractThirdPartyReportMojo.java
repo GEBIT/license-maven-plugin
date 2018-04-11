@@ -58,6 +58,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -195,6 +196,24 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      */
     @Parameter( property = "license.missingFileUrl" )
     String missingFileUrl;
+
+    /**
+     * Directly provided entries for missing licenses for dependencies with unknwon license. The key is GAV, the value
+     * is the license (both same as in the missing file).
+     *
+     * @since 1.16-gebit1
+     */
+    @Parameter
+    protected Properties missing;
+
+    /**
+     * If there are artifacts referenced in the missing file which are not actually used, a warning will be printed
+     * by default. In a multi module build with a centralised missing file you do not want this and can disable it.
+     *
+     * @since 1.16-gebit1
+     */
+    @Parameter( property = "license.ignoreUnusedMissing", defaultValue = "false" )
+    protected boolean ignoreUnusedMissing;
 
     /**
      * A file containing the override license information for dependencies.
@@ -588,8 +607,8 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
             if ( useMissingFile )
             {
                 // Resolve unsafe dependencies using missing files, this will update licenseMap and unsafeDependencies
-                thirdPartyHelper.createUnsafeMapping( licenseMap, missingFile, missingFileUrl,
-                        useRepositoryMissingFiles, dependenciesWithNoLicense,
+                thirdPartyHelper.createUnsafeMapping( licenseMap, missingFile, missingFileUrl, missing,
+                        useRepositoryMissingFiles, ignoreUnusedMissing, dependenciesWithNoLicense,
                         projectDependencies, loadedDependencies.getAllDependencies() );
             }
         }
