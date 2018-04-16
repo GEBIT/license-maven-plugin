@@ -27,6 +27,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.AbstractAddThirdPartyMojo.ExcludedLicenses;
+import org.codehaus.mojo.license.AbstractAddThirdPartyMojo.IncludedLicenses;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.SortedProperties;
 
@@ -177,5 +179,6 @@ public interface ThirdPartyHelper
      * @throws MojoFailureException if there is a bad license merge definition (says for example two license with
      *                              same name)
      */
-    void mergeLicenses( List<String> licenseMerges, LicenseMap licenseMap ) throws MojoFailureException;
+    void mergeLicenses( List<String> licenseMerges, LicenseMap licenseMap, IncludedLicenses includedLicenses,
+                        ExcludedLicenses excludedLicenses ) throws MojoFailureException;
 }

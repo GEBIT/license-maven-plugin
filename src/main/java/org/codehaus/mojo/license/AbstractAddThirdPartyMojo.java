@@ -814,7 +814,7 @@ public abstract class AbstractAddThirdPartyMojo
             }
         }
 
-        getHelper().mergeLicenses( licenseMerges, licenseMap );
+        getHelper().mergeLicenses( licenseMerges, licenseMap, includedLicenses, excludedLicenses );
 
         if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
         {

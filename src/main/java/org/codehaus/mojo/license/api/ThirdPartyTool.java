@@ -26,6 +26,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.mojo.license.AbstractAddThirdPartyMojo.ExcludedLicenses;
+import org.codehaus.mojo.license.AbstractAddThirdPartyMojo.IncludedLicenses;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.SortedProperties;
 
@@ -202,7 +204,8 @@ public interface ThirdPartyTool
      * @param mainLicense     the main license to keep
      * @param licensesToMerge all the licenses to merge
      */
-    void mergeLicenses( LicenseMap licenseMap, String mainLicense, Set<String> licensesToMerge );
+    void mergeLicenses( LicenseMap licenseMap, IncludedLicenses includedLicenses, ExcludedLicenses excludedLicenses,
+                        String mainLicense, Set<String> licensesToMerge );
 
     /**
      * Write the content of the third-party file.

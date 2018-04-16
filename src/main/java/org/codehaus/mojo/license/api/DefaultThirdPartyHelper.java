@@ -29,6 +29,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.AbstractAddThirdPartyMojo.ExcludedLicenses;
+import org.codehaus.mojo.license.AbstractAddThirdPartyMojo.IncludedLicenses;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.SortedProperties;
 
@@ -266,7 +268,8 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public void mergeLicenses( List<String> licenseMerges, LicenseMap licenseMap )
+    public void mergeLicenses( List<String> licenseMerges, LicenseMap licenseMap, IncludedLicenses includedLicenses,
+            ExcludedLicenses excludedLicenses )
             throws MojoFailureException
     {
 
@@ -340,7 +343,8 @@ public class DefaultThirdPartyHelper
                     LOG.info( "Will merge to '{}', licenses: {}", mainLicense, mergedLicense );
                 }
 
-                thirdPartyTool.mergeLicenses( licenseMap, mainLicense, mergedLicense );
+                thirdPartyTool.mergeLicenses( licenseMap, includedLicenses, excludedLicenses, mainLicense,
+                                              mergedLicense );
             }
         }
     }
