@@ -146,8 +146,9 @@ public interface ThirdPartyTool
      * @return the unsafe mapping
      * @throws IOException if pb while reading missing file
      */
-    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
-                                        String encoding, File missingFile, String missingFileUrl,
+    SortedProperties loadUnsafeMapping( MavenProject project, LicenseMap licenseMap,
+                                        SortedMap<String, MavenProject> artifactCache, String encoding,
+                                        File missingFile, String missingFileUrl,
                                         Properties missing, boolean ignoreUnusedMissing)
             throws IOException, MojoExecutionException;
 

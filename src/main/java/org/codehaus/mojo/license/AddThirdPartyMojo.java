@@ -204,7 +204,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
 
         SortedProperties unsafeMappings =
-                getHelper().createUnsafeMapping( getLicenseMap(), getMissingFile(), missingFileUrl,
+                getHelper().createUnsafeMapping( getProject(), getLicenseMap(), getMissingFile(), missingFileUrl,
                                                  missing, useRepositoryMissingFiles, ignoreUnusedMissing,
                                                  unsafeDependencies, getProjectDependencies() );
         if ( isVerbose() )

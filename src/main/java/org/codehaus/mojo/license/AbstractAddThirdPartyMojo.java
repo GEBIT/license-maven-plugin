@@ -836,7 +836,18 @@ public abstract class AbstractAddThirdPartyMojo
                 unsafeMappings.load(new ByteArrayInputStream(httpRequestResult.getBytes()));
             }
             if (missing != null) {
-                unsafeMappings.putAll(missing);
+                for (Map.Entry prop : missing.entrySet()) {
+                    String key = (String) prop.getKey();
+                    if (key.endsWith("--")) {
+                        // use managed version
+                        Artifact artifact = (Artifact) getProject().getManagedVersionMap().get(
+                            key.substring(0, key.length()-2).replaceAll("--", ":"));
+                        if (artifact != null) {
+                            key = key + artifact.getBaseVersion();
+                        }
+                    }
+                    unsafeMappings.put(key, prop.getValue());
+                }
             }
 
             Set<MavenProject> resolvedDependencies = new HashSet<MavenProject>();
