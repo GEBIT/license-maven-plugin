@@ -610,7 +610,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
             if ( useMissingFile )
             {
                 // Resolve unsafe dependencies using missing files, this will update licenseMap and unsafeDependencies
-                thirdPartyHelper.createUnsafeMapping( licenseMap, missingFile, missingFileUrl, missing,
+                thirdPartyHelper.createUnsafeMapping( project, licenseMap, missingFile, missingFileUrl, missing,
                         useRepositoryMissingFiles, ignoreUnusedMissing, dependenciesWithNoLicense,
                         projectDependencies, loadedDependencies.getAllDependencies() );
             }
