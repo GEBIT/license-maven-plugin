@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -57,6 +58,8 @@ import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.codehaus.mojo.license.AbstractAddThirdPartyMojo.ExcludedLicenses;
+import org.codehaus.mojo.license.AbstractAddThirdPartyMojo.IncludedLicenses;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.HttpRequester;
@@ -410,7 +413,8 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public void mergeLicenses( LicenseMap licenseMap, String mainLicense, Set<String> licenses )
+    public void mergeLicenses( LicenseMap licenseMap, IncludedLicenses includedLicenses,
+                               ExcludedLicenses excludedLicenses, String mainLicense, Set<String> licenses )
     {
 
         if ( licenses.isEmpty() )
@@ -420,6 +424,32 @@ public class DefaultThirdPartyTool
             return;
         }
 
+        if ( includedLicenses != null) {
+            for (ListIterator<String> it = includedLicenses.getData().listIterator(); it.hasNext(); ) {
+                String license = it.next();
+                if ( licenses.contains( license ) ) {
+                    if ( isVerbose() )
+                    {
+                        getLogger().info(
+                                "Merge included license [" + license + "] to [" + mainLicense + "]." );
+                    }
+                    it.set( mainLicense );
+                }
+            }
+        }
+        if ( excludedLicenses != null) {
+            for (ListIterator<String> it = excludedLicenses.getData().listIterator(); it.hasNext(); ) {
+                String license = it.next();
+                if ( licenses.contains( license ) ) {
+                    if ( isVerbose() )
+                    {
+                        getLogger().info(
+                                "Merge excluded license [" + license + "] to [" + mainLicense + "]." );
+                    }
+                    it.set( mainLicense );
+                }
+            }
+        }
         SortedSet<MavenProject> mainSet = licenseMap.get( mainLicense );
         if ( mainSet == null )
         {
