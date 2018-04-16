@@ -92,8 +92,8 @@ public interface ThirdPartyHelper
      * @return the map of all unsafe mapping
      * @throws IOException if could not load missing file
      */
-    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                        Properties missingMapping, boolean ignoreUnusedMissing,
+    SortedProperties loadUnsafeMapping( MavenProject project, LicenseMap licenseMap, File missingFile,
+                                        String missingFileUrl, Properties missingMapping, boolean ignoreUnusedMissing,
                                         SortedMap<String, MavenProject> projectDependencies )
       throws IOException, MojoExecutionException;
 
@@ -159,8 +159,8 @@ public interface ThirdPartyHelper
      * @throws ThirdPartyToolException  if pb with third-party tool
      */
     // CHECKSTYLE_OFF: ParameterNumber
-    SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                          Properties missingMapping,
+    SortedProperties createUnsafeMapping( MavenProject project, LicenseMap licenseMap, File missingFile,
+                                          String missingFileUrl, Properties missingMapping,
                                           boolean useRepositoryMissingFiles, boolean ignoreUnusedMissing,
                                           SortedSet<MavenProject> unsafeDependencies,
                                           SortedMap<String, MavenProject> projectDependencies,

@@ -175,12 +175,13 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                               Properties missingMapping, boolean ignoreUnusedMissing,
+    public SortedProperties loadUnsafeMapping( MavenProject project, LicenseMap licenseMap, File missingFile,
+                                               String missingFileUrl, Properties missingMapping,
+                                               boolean ignoreUnusedMissing,
                                                SortedMap<String, MavenProject> projectDependencies )
       throws IOException, MojoExecutionException
     {
-        return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile,
+        return thirdPartyTool.loadUnsafeMapping( project, licenseMap, projectDependencies, encoding, missingFile,
                 missingFileUrl, missingMapping, ignoreUnusedMissing );
     }
 
@@ -221,9 +222,9 @@ public class DefaultThirdPartyHelper
      * {@inheritDoc}
      */
     // CHECKSTYLE_OFF: ParameterNumber
-    public SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                                 Properties missingMapping, boolean useRepositoryMissingFiles,
-                                                 boolean ignoreUnusedMissing,
+    public SortedProperties createUnsafeMapping( MavenProject project, LicenseMap licenseMap, File missingFile,
+                                                 String missingFileUrl, Properties missingMapping,
+                                                 boolean useRepositoryMissingFiles, boolean ignoreUnusedMissing,
                                                  SortedSet<MavenProject> unsafeDependencies,
                                                  SortedMap<String, MavenProject> projectDependencies,
                                                  Set<Artifact> dependencyArtifacts )
@@ -231,8 +232,8 @@ public class DefaultThirdPartyHelper
     {
         // CHECKSTYLE_ON: ParameterNumber
 
-        SortedProperties unsafeMappings = loadUnsafeMapping( licenseMap, missingFile, missingFileUrl, missingMapping,
-                                                             ignoreUnusedMissing, projectDependencies );
+        SortedProperties unsafeMappings = loadUnsafeMapping( project, licenseMap, missingFile, missingFileUrl,
+                                                             missingMapping, ignoreUnusedMissing, projectDependencies );
 
         if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
         {

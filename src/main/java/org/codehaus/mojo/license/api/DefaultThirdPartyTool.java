@@ -49,6 +49,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -459,7 +460,9 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap,
+    // CHECKSTYLE_OFF: MethodLength
+    // CHECKSTYLE_OFF: ParameterNumber
+    public SortedProperties loadUnsafeMapping( MavenProject project, LicenseMap licenseMap,
                                                SortedMap<String, MavenProject> artifactCache,
                                                String encoding,
                                                File missingFile,
@@ -467,6 +470,7 @@ public class DefaultThirdPartyTool
                                                Properties missingMapping,
                                                boolean ignoreUnusedMissing ) throws IOException, MojoExecutionException
     {
+        // CHECKSTYLE_ON: ParameterNumber
         Map<String, MavenProject> snapshots = new HashMap<>();
 
         //find snapshot dependencies
@@ -511,7 +515,23 @@ public class DefaultThirdPartyTool
 
         if ( missingMapping != null )
         {
-            unsafeMappings.putAll( missingMapping );
+            for ( Map.Entry prop : missingMapping.entrySet() )
+            {
+                String key = (String) prop.getKey();
+                if ( key.endsWith( "--" ) )
+                {
+                    // use managed version
+                    for ( Dependency dep : project.getDependencyManagement().getDependencies() )
+                    {
+                        if ( key.equals( dep.getGroupId() + "--" + dep.getArtifactId() + "--" ) )
+                        {
+                            key = key + dep.getVersion();
+                            break;
+                        }
+                    }
+                }
+                unsafeMappings.put( key, prop.getValue() );
+            }
         }
 
         // get from the missing file, all unknown dependencies
@@ -526,8 +546,8 @@ public class DefaultThirdPartyTool
             String id = (String) o;
             String migratedId = migrateKeys.get( id );
 
-            MavenProject project = artifactCache.get( migratedId );
-            if ( project == null )
+            MavenProject projectDependency = artifactCache.get( migratedId );
+            if ( projectDependency == null )
             {
                 // now we are sure this is a unknown dependency
                 unknownDependenciesId.add( id );
@@ -568,8 +588,8 @@ public class DefaultThirdPartyTool
         {
             String id = (String) o;
 
-            MavenProject project = artifactCache.get( id );
-            if ( project == null )
+            MavenProject projectDependency = artifactCache.get( id );
+            if ( projectDependency == null )
             {
                 getLogger().warn( "dependency [" + id + "] does not exist in project." );
                 continue;
@@ -587,10 +607,10 @@ public class DefaultThirdPartyTool
             }
 
             // add license in map
-            addLicense( licenseMap, project, licenses );
+            addLicense( licenseMap, projectDependency, licenses );
 
             // remove unknown license
-            unsafeDependencies.remove( project );
+            unsafeDependencies.remove( projectDependency );
         }
 
         if ( unsafeDependencies.isEmpty() )
@@ -603,9 +623,9 @@ public class DefaultThirdPartyTool
         {
 
             // add a "with no value license" for missing dependencies
-            for ( MavenProject project : unsafeDependencies )
+            for ( MavenProject projectDependency : unsafeDependencies )
             {
-                String id = MojoHelper.getArtifactId( project.getArtifact() );
+                String id = MojoHelper.getArtifactId( projectDependency.getArtifact() );
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug( "dependency [" + id + "] has no license, add it in the missing file." );
@@ -615,6 +635,7 @@ public class DefaultThirdPartyTool
         }
         return unsafeMappings;
     }
+    // CHECKSTYLE_ON: MethodLength
 
     /**
      * {@inheritDoc}

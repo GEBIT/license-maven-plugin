@@ -259,7 +259,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     {
 
         SortedProperties unsafeMappings =
-                getHelper().createUnsafeMapping( licenseMap, missingFile, missingFileUrl, missing,
+                getHelper().createUnsafeMapping( project, licenseMap, missingFile, missingFileUrl, missing,
                                                  useRepositoryMissingFiles, ignoreUnusedMissing, unsafeDependencies,
                                                  projectDependencies,
                                                  resolveDependencyArtifacts().getAllDependencies() );
