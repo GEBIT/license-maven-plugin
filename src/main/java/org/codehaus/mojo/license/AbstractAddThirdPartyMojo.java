@@ -659,11 +659,8 @@ public abstract class AbstractAddThirdPartyMojo
 
         if ( !CollectionUtils.isEmpty( unsafeDependencies ) )
         {
-            if ( isUseMissingFile() && isDoGenerate() )
-            {
-                // load unsafeMapping from local file and/or third-party classified items.
-                unsafeMappings = createUnsafeMapping();
-            }
+            // load unsafeMapping from local file and/or third-party classified items.
+            unsafeMappings = createUnsafeMapping();
         }
 
         getHelper().mergeLicenses( licenseMerges, licenseMap, includedLicenses, excludedLicenses );
