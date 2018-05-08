@@ -26,6 +26,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.doxia.siterenderer.Renderer;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -563,7 +564,8 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     // Protected Methods
     // ----------------------------------------------------------------------
 
-    Collection<ThirdPartyDetails> createThirdPartyDetails( MavenProject project, boolean loadArtifacts )
+    Collection<ThirdPartyDetails> createThirdPartyDetails( MavenProject project, boolean loadArtifacts,
+                                                           Map<String, List<Dependency>> reactorProjects )
       throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
              DependenciesToolException, MojoExecutionException
     {
