@@ -1,5 +1,7 @@
 package org.codehaus.mojo.license;
 
+import org.apache.maven.model.Dependency;
+
 /*
  * #%L
  * License Maven Plugin
@@ -27,6 +29,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.api.DependenciesToolException;
 import org.codehaus.mojo.license.api.ThirdPartyDetails;
@@ -34,6 +37,9 @@ import org.codehaus.mojo.license.api.ThirdPartyToolException;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Generates a report of all third-parties detected in the module.
@@ -56,6 +62,14 @@ public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo
      */
     @Parameter( property = "license.skipThirdPartyReport", defaultValue = "false" )
     private boolean skipThirdPartyReport;
+
+    /**
+     * The projects in the reactor.
+     *
+     * @since 1.10
+     */
+    @Parameter( property = "reactorProjects", readonly = true, required = true )
+    private List<MavenProject> reactorProjects;
 
     // ----------------------------------------------------------------------
     // MavenReport Implementaton
@@ -87,6 +101,10 @@ public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo
       throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
              DependenciesToolException, MojoExecutionException
     {
-        return createThirdPartyDetails( getProject(), false );
+        Map<String, List<Dependency>> reactorProjectDependencies = new TreeMap<String, List<Dependency>>();
+        for (MavenProject reactorProject : this.reactorProjects) {
+            reactorProjectDependencies.put(String.format("%s:%s", reactorProject.getGroupId(), reactorProject.getArtifactId()), reactorProject.getDependencies());
+        }
+        return createThirdPartyDetails( getProject(), false, reactorProjectDependencies );
     }
 }

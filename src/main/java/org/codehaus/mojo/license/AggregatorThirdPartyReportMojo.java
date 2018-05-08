@@ -2,6 +2,7 @@ package org.codehaus.mojo.license;
 
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -18,6 +19,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Generates a report of all third-parties detected in the module.
@@ -98,10 +101,15 @@ public class AggregatorThirdPartyReportMojo
 
         Collection<ThirdPartyDetails> details = new LinkedHashSet<ThirdPartyDetails>();
 
+        Map<String, List<Dependency>> reactorProjectDependencies = new TreeMap<String, List<Dependency>>();
+        for (MavenProject reactorProject : this.reactorProjects) {
+            reactorProjectDependencies.put(String.format("%s:%s", reactorProject.getGroupId(), reactorProject.getArtifactId()), reactorProject.getDependencies());
+        }
+
         for ( MavenProject reactorProject : reactorProjects )
         {
 
-            Collection<ThirdPartyDetails> thirdPartyDetails = createThirdPartyDetails( reactorProject, true );
+            Collection<ThirdPartyDetails> thirdPartyDetails = createThirdPartyDetails( reactorProject, true, reactorProjectDependencies );
             details.addAll( thirdPartyDetails );
 
         }
