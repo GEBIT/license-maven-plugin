@@ -359,10 +359,10 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
         {
             throw new MavenReportException( e.getMessage(), e );
         }
-        catch ( InvalidDependencyVersionException e )
-        {
-            throw new MavenReportException( e.getMessage(), e );
-        }
+//        catch ( InvalidDependencyVersionException e )
+//        {
+//            throw new MavenReportException( e.getMessage(), e );
+//        }
         catch ( ArtifactNotFoundException e )
         {
             throw new MavenReportException( e.getMessage(), e );

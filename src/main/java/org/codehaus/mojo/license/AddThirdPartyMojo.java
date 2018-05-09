@@ -445,7 +445,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         missingLicensesFileArtifact = mojo.missingLicensesFileArtifact;
         localRepository = mojo.localRepository;
         remoteRepositories = mojo.remoteRepositories;
-        dependencies = new HashSet<Artifact>(mavenProject.getDependencies());
+        dependencies = new HashSet<Artifact>(mavenProject.getDependencyArtifacts());
         licenseMerges = mojo.licenseMerges;
         licenseMergesFile = mojo.licenseMergesFile;
         includedLicenses = mojo.includedLicenses;

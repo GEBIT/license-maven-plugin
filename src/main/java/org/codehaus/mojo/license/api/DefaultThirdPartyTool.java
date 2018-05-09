@@ -52,12 +52,14 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.mojo.license.AbstractAddThirdPartyMojo.ExcludedLicenses;
 import org.codehaus.mojo.license.AbstractAddThirdPartyMojo.IncludedLicenses;
 import org.codehaus.mojo.license.model.LicenseMap;
@@ -112,7 +114,7 @@ public class DefaultThirdPartyTool
      * The component that is used to resolve additional artifacts required.
      */
     @Requirement
-    private ArtifactResolver artifactResolver;
+    private RepositorySystem artifactResolver;
 
     /**
      * The component used for creating artifact instances.
@@ -125,6 +127,9 @@ public class DefaultThirdPartyTool
      */
     @Requirement
     private MavenProjectHelper projectHelper;
+
+    @Requirement
+    private MavenSession session;
 
     /**
      * freeMarker helper.
@@ -761,7 +766,12 @@ public class DefaultThirdPartyTool
                                    SortedProperties result )
             throws IOException, ArtifactNotFoundException, ArtifactResolutionException
     {
-        artifactResolver.resolve( dep, repositories, localRepository );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest();
+        request.setArtifact(dep);
+        request.setResolveTransitively(false);
+        request.setLocalRepository(localRepository);
+        request.setRemoteRepositories(repositories);
+        artifactResolver.resolve(request);
         File propFile = dep.getFile();
         getLogger().info(
                 String.format( "Loading global license map from %s: %s", dep.toString(), propFile.getAbsolutePath() ) );
@@ -849,7 +859,12 @@ public class DefaultThirdPartyTool
         Artifact artifact = artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type,
                                                                           classifier );
 
-        artifactResolver.resolve( artifact, repositories, localRepository );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest();
+        request.setArtifact(artifact);
+        request.setResolveTransitively(false);
+        request.setLocalRepository(localRepository);
+        request.setRemoteRepositories(repositories);
+        artifactResolver.resolve(request);
 
         return artifact.getFile();
     }

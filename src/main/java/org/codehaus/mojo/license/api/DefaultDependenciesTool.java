@@ -34,27 +34,32 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
+import org.eclipse.aether.DefaultRepositoryCache;
 
 /**
  * Default implementation of the {@link DependenciesTool}.
@@ -79,16 +84,19 @@ public class DefaultDependenciesTool
      * Project builder.
      */
     @Requirement
-    private MavenProjectBuilder mavenProjectBuilder;
+    private ProjectBuilder mavenProjectBuilder;
 
     @Requirement
     private ArtifactFactory artifactFactory;
 
     @Requirement
-    private ArtifactResolver artifactResolver;
+    private RepositorySystem artifactResolver;
 
     @Requirement
     private ArtifactMetadataSource artifactMetadataSource;
+
+    @Requirement
+    private MavenSession session;
 
     /**
      * {@inheritDoc}
@@ -250,8 +258,15 @@ public class DefaultDependenciesTool
 
                 try
                 {
+                    ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
+                    request.setLocalRepository( localRepository );
+                    request.setRemoteRepositories( remoteRepositories );
+                    request.setProcessPlugins( false );
+                    request.setRepositorySession( session.getRepositorySession() );
+                    request.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+                    request.setSystemProperties( session.getSystemProperties() );
                     depMavenProject =
-                        mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository, true );
+                        mavenProjectBuilder.build( artifact, true, request ).getProject();
                     depMavenProject.getArtifact().setScope( artifact.getScope() );
                 }
                 catch ( ProjectBuildingException e )
@@ -359,19 +374,26 @@ public class DefaultDependenciesTool
             }
         }
         ArtifactResolutionResult result;
-        try
-        {
-            result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(), artifact, remoteRepositories,
-                                                           localRepository, artifactMetadataSource );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new DependenciesToolException( e );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new DependenciesToolException( e );
-        }
+//        try
+//        {
+            ArtifactResolutionRequest request = new ArtifactResolutionRequest();
+            request.setArtifact(artifact);
+            request.setArtifactDependencies(project.getDependencyArtifacts());
+            request.setResolveTransitively(true);
+            request.setLocalRepository(localRepository);
+            request.setRemoteRepositories(remoteRepositories);
+            result = artifactResolver.resolve(request);
+//            		Transitively( project.getDependencyArtifacts(), artifact, remoteRepositories,
+//                                                           localRepository, artifactMetadataSource );
+//        }
+//        catch ( ArtifactResolutionException e )
+//        {
+//            throw new DependenciesToolException( e );
+//        }
+//        catch ( ArtifactNotFoundException e )
+//        {
+//            throw new DependenciesToolException( e );
+//        }
         reactorArtifacts.addAll(result.getArtifacts());
 
         project.setArtifacts( reactorArtifacts );
