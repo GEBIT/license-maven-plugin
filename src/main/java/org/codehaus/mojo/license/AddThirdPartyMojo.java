@@ -47,6 +47,7 @@ import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -223,6 +224,18 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     @Override
     protected SortedMap<String, MavenProject> loadDependencies() throws DependenciesToolException
     {
+        SortedMap<String, MavenProject> artifactCache = getHelper().getArtifactCache();
+        if ( reactorProjectDependencies != null )
+        {
+            for ( MavenProject project : reactorProjectDependencies )
+            {
+                String id = MojoHelper.getArtifactId( project.getArtifact() );
+                if ( !artifactCache.containsKey( id ) )
+                {
+                    artifactCache.put( id, project );
+                }
+            }
+        }
         return getHelper().loadDependencies( this, resolveDependencyArtifacts() );
     }
 

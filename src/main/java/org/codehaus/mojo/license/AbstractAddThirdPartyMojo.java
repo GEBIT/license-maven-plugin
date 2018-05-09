@@ -884,8 +884,8 @@ public abstract class AbstractAddThirdPartyMojo
     {
         if ( helper == null )
         {
-            helper = new DefaultThirdPartyHelper( getProject(), getEncoding(), isVerbose(), dependenciesTool,
-                    thirdPartyTool, getProject().getRemoteArtifactRepositories(),
+            helper = new DefaultThirdPartyHelper( getSession(), getProject(), getEncoding(), isVerbose(),
+                    dependenciesTool, thirdPartyTool, getProject().getRemoteArtifactRepositories(),
                     getProject().getRemoteProjectRepositories() );
         }
         return helper;

@@ -192,7 +192,7 @@ public class MojoHelper
         sb.append( "--" );
         sb.append( artifact.getArtifactId() );
         sb.append( "--" );
-        sb.append( artifact.getVersion() );
+        sb.append( artifact.getBaseVersion() );
         return sb.toString();
     }
 
