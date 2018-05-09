@@ -803,7 +803,7 @@ public abstract class AbstractAddThirdPartyMojo
         if ( helper == null )
         {
             helper =
-                    new DefaultThirdPartyHelper( getProject(), getEncoding(), isVerbose(), dependenciesTool, thirdPartyTool,
+                    new DefaultThirdPartyHelper( getSession(), getProject(), getEncoding(), isVerbose(), dependenciesTool, thirdPartyTool,
                                                  localRepository, remoteRepositories, getLog() );
         }
         return helper;

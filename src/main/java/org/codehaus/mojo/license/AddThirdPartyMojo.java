@@ -79,6 +79,14 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     @Parameter( property = "license.skipAddThirdParty", defaultValue = "false" )
     private boolean skipAddThirdParty;
 
+    /**
+     * The projects in the reactor.
+     *
+     * @since 1.17
+     */
+    @Parameter( property = "reactorProjects", readonly = true, required = true )
+    private List<MavenProject> reactorProjects;
+
     // ----------------------------------------------------------------------
     // Private Fields
     // ----------------------------------------------------------------------
@@ -190,6 +198,13 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     @Override
     protected SortedMap<String, MavenProject> loadDependencies()
     {
+        SortedMap<String, MavenProject> artifactCache = getHelper().getArtifactCache();
+        for ( MavenProject project : reactorProjects ) {
+            String id = MojoHelper.getArtifactId( project.getArtifact() );
+            if ( !artifactCache.containsKey(id) ) {
+                artifactCache.put( id, project );
+            }
+        }
         return getHelper().loadDependencies( this );
     }
 
