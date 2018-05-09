@@ -39,6 +39,7 @@ import java.util.TreeMap;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -89,6 +90,11 @@ public class DefaultThirdPartyHelper
     private final MavenProject project;
 
     /**
+     * Current maven project.
+     */
+    private final MavenSession session;
+
+    /**
      * Encoding used to read and write files.
      */
     private final String encoding;
@@ -120,11 +126,12 @@ public class DefaultThirdPartyHelper
      * @param remoteRepositories maven remote repositories
      * @param log                logger
      */
-    public DefaultThirdPartyHelper( MavenProject project, String encoding, boolean verbose,
+    public DefaultThirdPartyHelper( MavenSession session, MavenProject project, String encoding, boolean verbose,
                                     DependenciesTool dependenciesTool, ThirdPartyTool thirdPartyTool,
                                     ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
                                     Log log )
     {
+    	this.session = session;
         this.project = project;
         this.encoding = encoding;
         this.verbose = verbose;
@@ -143,7 +150,11 @@ public class DefaultThirdPartyHelper
     {
         if ( artifactCache == null )
         {
-            artifactCache = new TreeMap<String, MavenProject>();
+            artifactCache = (SortedMap<String, MavenProject>) session.getRepositorySession().getCache().get(session.getRepositorySession(), "license-maven-plugin-cache");
+            if (artifactCache == null) {
+                artifactCache = new TreeMap<String, MavenProject>();
+                session.getRepositorySession().getCache().put(session.getRepositorySession(), "license-maven-plugin-cache", artifactCache);
+            }
         }
         return artifactCache;
     }
