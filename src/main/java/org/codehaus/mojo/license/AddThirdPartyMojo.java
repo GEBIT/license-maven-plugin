@@ -84,6 +84,14 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     private boolean skipAddThirdParty;
 
     /**
+     * To skip generating the missing file
+     *
+     * @since 1.17
+     */
+    @Parameter( property = "license.skipGenerateMissing", defaultValue = "false" )
+    private boolean skipGenerateMissing;
+
+    /**
      * The projects in the reactor.
      *
      * @since 1.17
@@ -362,7 +370,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
                                                   SortedSet<MavenProject> unsafeDependencies ) throws IOException
     {
 
-        if ( !useMissingFile )
+        if ( !useMissingFile || skipGenerateMissing )
         {
 
             // never use the missing file
