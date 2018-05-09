@@ -48,6 +48,7 @@ import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 
 // CHECKSTYLE_OFF: LineLength
@@ -81,6 +82,14 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      */
     @Parameter( property = "license.skipAddThirdParty", defaultValue = "false" )
     private boolean skipAddThirdParty;
+
+    /**
+     * The projects in the reactor.
+     *
+     * @since 1.17
+     */
+    @Parameter( property = "reactorProjects", readonly = true, required = true )
+    private List<MavenProject> reactorProjects;
 
     // ----------------------------------------------------------------------
     // Private Fields
@@ -221,6 +230,15 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     @Override
     protected SortedMap<String, MavenProject> loadDependencies() throws DependenciesToolException
     {
+        SortedMap<String, MavenProject> artifactCache = getHelper().getArtifactCache();
+        for ( MavenProject project : reactorProjects )
+        {
+            String id = MojoHelper.getArtifactId( project.getArtifact() );
+            if ( !artifactCache.containsKey( id ) )
+            {
+                artifactCache.put( id, project );
+            }
+        }
         return getHelper().loadDependencies( this, resolveDependencyArtifacts() );
     }
 

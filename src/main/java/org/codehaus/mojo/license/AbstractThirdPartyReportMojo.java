@@ -26,6 +26,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.doxia.siterenderer.Renderer;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -328,6 +329,14 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     @Parameter( defaultValue = "${project}", readonly = true )
     private MavenProject project;
 
+    /**
+     * The Maven Session.
+     *
+     * @since 1.17
+     */
+    @Parameter( defaultValue = "${session}", readonly = true )
+    private MavenSession session;
+
     // ----------------------------------------------------------------------
     // Plexus Components
     // ----------------------------------------------------------------------
@@ -583,7 +592,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
         }
 
         ThirdPartyHelper thirdPartyHelper =
-                new DefaultThirdPartyHelper( project, encoding, verbose,
+                new DefaultThirdPartyHelper( session, project, encoding, verbose,
                         dependenciesTool, thirdPartyTool,
                         project.getRemoteArtifactRepositories(), project.getRemoteProjectRepositories(), getLog() );
         // load dependencies of the project
