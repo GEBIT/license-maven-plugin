@@ -153,8 +153,11 @@ public class DefaultThirdPartyHelper
      */
     public SortedMap<String, MavenProject> loadDependencies( MavenProjectDependenciesConfigurator configuration )
     {
-        return dependenciesTool.loadProjectDependencies( project, configuration, localRepository, remoteRepositories,
-                                                         getArtifactCache() );
+        SortedMap<String, MavenProject> cache = getArtifactCache();
+        synchronized (cache) {
+            return dependenciesTool.loadProjectDependencies( project, configuration, localRepository,
+                                                             remoteRepositories, cache );
+    	}
     }
 
     /**

@@ -640,8 +640,9 @@ public abstract class AbstractAddThirdPartyMojo
         }
 
         projectDependencies = loadDependencies();
-
-        licenseMap = getHelper().createLicenseMap( projectDependencies );
+        synchronized (projectDependencies) {
+            licenseMap = getHelper().createLicenseMap( projectDependencies );
+        }
 
         if (licenseMergesFile != null) {
             getLog().warn("");
@@ -1013,7 +1014,9 @@ public abstract class AbstractAddThirdPartyMojo
     void overrideLicenses() throws IOException
     {
         LicenseMap licenseMap1 = getLicenseMap();
-        thirdPartyTool.overrideLicenses( licenseMap1, projectDependencies, getEncoding(), overrideFile );
+        synchronized (projectDependencies) {
+            thirdPartyTool.overrideLicenses( licenseMap1, projectDependencies, getEncoding(), overrideFile );
+        }
     }
 
     private boolean isFailOnMissing() {

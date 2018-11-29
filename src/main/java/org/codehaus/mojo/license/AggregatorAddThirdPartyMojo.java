@@ -286,10 +286,12 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 
             if ( file.exists() )
             {
-
-                SortedProperties tmp = getHelper().loadUnsafeMapping( p, licenseMap, file, null, missing,
-                                                                      ignoreUnusedMissing, getProjectDependencies() );
-                unsafeMappings.putAll( tmp );
+                SortedMap<String, MavenProject> cache = getProjectDependencies();
+                synchronized (cache) {
+                    SortedProperties tmp = getHelper().loadUnsafeMapping( p, licenseMap, file, null, missing,
+                                                                          ignoreUnusedMissing, cache );
+                    unsafeMappings.putAll( tmp );
+                }
             }
 
             SortedSet<MavenProject> unsafe = getHelper().getProjectsWithNoLicense( licenseMap );
