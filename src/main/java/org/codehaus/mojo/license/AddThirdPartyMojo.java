@@ -66,7 +66,7 @@ import org.codehaus.mojo.license.utils.SortedProperties;
  */
 // CHECKSTYLE_ON: LineLength
 @Mojo( name = "add-third-party", requiresDependencyResolution = ResolutionScope.TEST,
-       defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
+       defaultPhase = LifecyclePhase.GENERATE_RESOURCES, threadSafe = true )
 public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements MavenProjectDependenciesConfigurator
 {
 
@@ -258,11 +258,13 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
             MojoExecutionException, DependenciesToolException
     {
 
-        SortedProperties unsafeMappings =
-                getHelper().createUnsafeMapping( project, licenseMap, missingFile, missingFileUrl, missing,
+        synchronized ( projectDependencies )
+        {
+            unsafeMappings = getHelper().createUnsafeMapping( project, licenseMap, missingFile, missingFileUrl, missing,
                                                  useRepositoryMissingFiles, ignoreUnusedMissing, unsafeDependencies,
                                                  projectDependencies,
                                                  resolveDependencyArtifacts().getAllDependencies() );
+        }
         if ( isVerbose() )
         {
             getLog().info( "found " + unsafeMappings.size() + " unsafe mappings" );
