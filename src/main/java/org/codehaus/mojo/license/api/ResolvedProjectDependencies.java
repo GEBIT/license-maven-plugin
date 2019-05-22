@@ -47,7 +47,8 @@ public class ResolvedProjectDependencies
     public ResolvedProjectDependencies( Set<Artifact> allDependencies, Set<Artifact> directDependencies )
     {
         this.allDependencies = Collections.unmodifiableSet( new HashSet<>( allDependencies ) );
-        this.directDependencies = Collections.unmodifiableSet( new HashSet<>( directDependencies ) );
+        this.directDependencies = directDependencies != null
+                ? Collections.unmodifiableSet( new HashSet<>( directDependencies ) ) : Collections.<Artifact>emptySet();
     }
 
     public Set<Artifact> getAllDependencies()
