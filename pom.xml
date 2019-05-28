@@ -32,7 +32,7 @@
   </parent>
 
   <artifactId>license-maven-plugin</artifactId>
-  <version>1.21-SNAPSHOT</version>
+  <version>1.21-gebit1</version>
   <packaging>maven-plugin</packaging>
 
   <name>License Maven Plugin</name>
