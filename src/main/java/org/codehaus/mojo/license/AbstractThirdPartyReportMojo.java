@@ -170,6 +170,14 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     private boolean excludeTransitiveDependencies;
 
     /**
+     * Exclude reactor projects from dependencies.
+     *
+     * @since 2.0.0-gebit1
+     */
+    @Parameter( property = "license.excludeReactorProjects", defaultValue = "false" )
+    private boolean excludeReactorProjects;
+
+    /**
      * If {@code true} both optional and non-optional dependencies will be included in the list of artifacts for
      * creating the license report; otherwise only non-optional dependencies will be considered.
      *
@@ -558,6 +566,14 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     public boolean isExcludeTransitiveDependencies()
     {
         return excludeTransitiveDependencies;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isExcludeReactorProjects()
+    {
+        return excludeReactorProjects;
     }
 
     /** {@inheritDoc} */

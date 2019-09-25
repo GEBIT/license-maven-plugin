@@ -47,6 +47,11 @@ public interface MavenProjectDependenciesConfigurator
     boolean isExcludeTransitiveDependencies();
 
     /**
+     * @return {@code true} if projects from the reactor itself are to be excluded from the dependencies.
+     */
+    boolean isExcludeReactorProjects();
+
+    /**
      * @return {@link ArtifactFilters} to apply when processing dependencies
      */
     ArtifactFilters getArtifactFilters();

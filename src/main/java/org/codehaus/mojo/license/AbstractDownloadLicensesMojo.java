@@ -351,6 +351,14 @@ public abstract class AbstractDownloadLicensesMojo
     private boolean includeTransitiveDependencies;
 
     /**
+     * Exclude reactor projects from dependencies.
+     *
+     * @since 2.0.0-gebit1
+     */
+    @Parameter( defaultValue = "false" )
+    private boolean excludeReactorProjects;
+
+    /**
      * Exclude transitive dependencies from excluded artifacts.
      *
      * @since 1.13
@@ -1000,6 +1008,14 @@ public abstract class AbstractDownloadLicensesMojo
     public boolean isExcludeTransitiveDependencies()
     {
         return excludeTransitiveDependencies;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isExcludeReactorProjects()
+    {
+        return excludeReactorProjects;
     }
 
     /** {@inheritDoc} */

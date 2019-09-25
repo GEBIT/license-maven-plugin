@@ -340,6 +340,14 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         return excludeTransitiveDependencies;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isExcludeReactorProjects()
+    {
+        return excludeReactorProjects;
+    }
+
     /** {@inheritDoc} */
     public ArtifactFilters getArtifactFilters()
     {

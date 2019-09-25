@@ -127,6 +127,12 @@ public class LicensesXmlInsertVersionsMojo
                 }
 
                 @Override
+                public boolean isExcludeReactorProjects()
+                {
+                    return false;
+                }
+
+                @Override
                 public boolean isExcludeTransitiveDependencies()
                 {
                     return false;

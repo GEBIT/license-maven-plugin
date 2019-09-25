@@ -114,6 +114,14 @@ public class DependenciesTool
         Map<String, Artifact> excludeArtifacts = new HashMap<>();
         Map<String, Artifact> includeArtifacts = new HashMap<>();
 
+        if ( configuration.isExcludeReactorProjects() )
+        {
+            for ( MavenProject project : mavenSession.getAllProjects() )
+            {
+                excludeArtifacts.put( project.getArtifact().getId(), project.getArtifact() );
+            }
+        }
+
         SortedMap<String, MavenProject> localCache = new TreeMap<>();
         if ( cache != null )
         {
@@ -131,6 +139,10 @@ public class DependenciesTool
 
         for ( Artifact artifact : depArtifacts )
         {
+            if ( excludeArtifacts.containsKey( artifact.getId() ) )
+            {
+                continue;
+            }
             excludeArtifacts.put( artifact.getId(), artifact );
 
             if ( DefaultThirdPartyTool.LICENSE_DB_TYPE.equals( artifact.getType() ) )
