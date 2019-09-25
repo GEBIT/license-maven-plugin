@@ -131,7 +131,6 @@ public class DependenciesTool
 
         for ( Artifact artifact : depArtifacts )
         {
-
             excludeArtifacts.put( artifact.getId(), artifact );
 
             if ( DefaultThirdPartyTool.LICENSE_DB_TYPE.equals( artifact.getType() ) )

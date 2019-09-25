@@ -23,12 +23,17 @@ package org.codehaus.mojo.license;
  */
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.lifecycle.internal.DependencyContext;
+import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -58,6 +63,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -375,6 +381,9 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     @Component
     private ThirdPartyTool thirdPartyTool;
 
+    @Component
+    private MojoExecutor mojoExecutor;
+
     /**
      * A URL returning a plain text file that contains include/exclude artifact filters in the following format:
      * <pre>
@@ -581,16 +590,27 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     {
 
         ResolvedProjectDependencies loadedDependencies;
-        if ( loadArtifacts )
+        if ( loadArtifacts || project.getDependencyArtifacts() == null )
         {
-            loadedDependencies =
-                    new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() );
+            // make sure reactor is resolved (SiteMojo does not resolve reactor projects!)
+            MojoDescriptor fakeDescriptor = new MojoDescriptor();
+            fakeDescriptor.setAggregator( true );
+            fakeDescriptor.setDependencyCollectionRequired( Artifact.SCOPE_TEST );
+            DependencyContext dependencyContext = new DependencyContext( project,
+                Collections.<String>emptyList(),
+                Arrays.asList( Artifact.SCOPE_COMPILE, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_PROVIDED,
+                    Artifact.SCOPE_RUNTIME, Artifact.SCOPE_TEST ) );
+            try
+            {
+                mojoExecutor.ensureDependenciesAreResolved( fakeDescriptor, session, dependencyContext );
+            }
+            catch ( LifecycleExecutionException exc )
+            {
+                throw new DependenciesToolException( exc );
+            }
         }
-        else
-        {
-            loadedDependencies = new ResolvedProjectDependencies( getProject().getArtifacts(),
-                    getProject().getDependencyArtifacts() );
-        }
+        loadedDependencies = new ResolvedProjectDependencies( project.getArtifacts(),
+                project.getDependencyArtifacts() );
 
         ThirdPartyHelper thirdPartyHelper =
                 new DefaultThirdPartyHelper( session, project, encoding, verbose,
