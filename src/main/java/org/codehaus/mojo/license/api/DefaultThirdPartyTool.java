@@ -618,7 +618,10 @@ public class DefaultThirdPartyTool
             MavenProject projectDependency = artifactCache.get( id );
             if ( projectDependency == null )
             {
-                LOG.warn( "dependency [{}] does not exist in project.", id );
+                if ( verbose )
+                {
+                    LOG.warn( "dependency [{}] does not exist in project.", id );
+                }
                 continue;
             }
 
@@ -684,7 +687,10 @@ public class DefaultThirdPartyTool
                 MavenProject project = artifactCache.get( id );
                 if ( project == null )
                 {
-                    LOG.warn( "dependency [{}] does not exist in project.", id );
+                    if ( verbose )
+                    {
+                        LOG.warn( "dependency [{}] does not exist in project.", id );
+                    }
                     continue;
                 }
 
